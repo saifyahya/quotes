@@ -6,7 +6,10 @@ package quotes;
 public class App {
 
     public static void main(String[] args) {
-       Quotes myQuote= Quotes.readQuotes("app/src/test/resources/recentquotes.json");
-        System.out.println(myQuote.toString());
+       /*Quotes myQuote= Quotes.readQuotesFromFile("app/src/test/resources/recentquotes.json");
+        System.out.println(myQuote.toString());*/
+
+        Quotes myApiQuote= Quotes.readQuotesFromApi();
+        System.out.println(myApiQuote.toString());
     }
 }

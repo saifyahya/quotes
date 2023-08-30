@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AppTest {
   @Test void testQuotes() {  // test can read from Json file and choose a random quote
-Quotes quote = Quotes.readQuotes("src/test/resources/recentquotes.json") ;
+Quotes quote = Quotes.readQuotesFromFile("src/test/resources/recentquotes.json") ;
       Assertions.assertNotNull(quote);
   }
 }

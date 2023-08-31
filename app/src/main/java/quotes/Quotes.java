@@ -10,58 +10,70 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class Quotes {
-    private String [] tags;
     private String author;
-    private String likes;
     private String text;
     private Quote quote;
 
-    public Quotes(String[] tags, String author, String likes, String text) {
-        this.tags = tags;
+    public Quotes(String author, String text) {
         this.author = author;
-        this.likes = likes;
         this.text = text;
     }
-    public  static Quotes readQuotesFromFile(String path) {
+
+    public static Quotes readQuotesFromFile(String path) {
         Quotes[] quotes;
-        Quotes randomQuote;
-        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {  //path="app/src/main/resources/recentquotes.json"
+        Quotes randomQuote = null;
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {  //path="app/src/test/resources/recentQuotes.json"
             Gson gson = new Gson();
             quotes = gson.fromJson(reader, Quotes[].class);
             Random random = new Random();
             randomQuote = quotes[random.nextInt(quotes.length)];
+            System.out.println(randomQuote);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         return randomQuote;
     }
-    public  static Quotes readQuotesFromApi() {
-        Quotes myQuote;
-        URL apiUrl=null;
-        try  {
-           apiUrl=new URL("https://favqs.com/api/qotd");
+
+    public static Quotes readQuotesFromApi() {
+        Quotes myQuote = null;
+        URL apiUrl = null;
+        try {
+            Gson gson = new Gson();
+            apiUrl = new URL("https://example.com");
             HttpURLConnection apiUrlConnection = (HttpURLConnection) apiUrl.openConnection();
             apiUrlConnection.setRequestMethod("GET");
-            InputStreamReader streamReader = new InputStreamReader(apiUrlConnection.getInputStream());
-            BufferedReader apiBufferedReader= new BufferedReader(streamReader);
-            String quoteData=apiBufferedReader.readLine();
-            System.out.println(quoteData);
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-           myQuote= gson.fromJson(quoteData, Quotes.class);
-           File myFile = new File("app/src/test/resources/recentquotes.json");
-           try (FileWriter write = new FileWriter(myFile)){
-               gson.toJson(myQuote,write);
-           }
+            InputStreamReader streamReader = null;
+            if (apiUrlConnection.getResponseCode() > 299) {    // indicates a failed response
+                myQuote = readQuotesFromFile("app/src/test/resources/recentQuotes.json");  //read from the file
+            } else {
+                streamReader = new InputStreamReader(apiUrlConnection.getInputStream());
+                BufferedReader apiBufferedReader = new BufferedReader(streamReader);
+                String quoteData = apiBufferedReader.readLine();
+                System.out.println(quoteData);
+                gson = new GsonBuilder().setPrettyPrinting().create();
+                myQuote = gson.fromJson(quoteData, Quotes.class);
+            }
+            File myFile = new File("app/src/test/resources/recentQuotesFromApi.json");
+            try (FileWriter write = new FileWriter(myFile)) {
+                gson.toJson(myQuote, write);
+            }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         return myQuote;
     }
+
+
     @Override
     public String toString() {
-        return "Quotes{" +
-                "author='" + author + '\'' +
-                ", text='" + text + '\'' +
-                '}';
+        if (author == null) //  read throw the api
+            return "Quotes{" +
+                     quote +
+                    '}';
+        else  // read throw file
+            return "Quotes{" +
+                    "author='" + author + '\'' +
+                    ", text='" + text + '\'' +
+                    '}';
     }
 }

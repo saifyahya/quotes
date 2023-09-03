@@ -6,10 +6,17 @@ package quotes;
 public class App {
 
     public static void main(String[] args) {
-        Quotes myQuote = Quotes.readQuotesFromFile("app/src/main/resources/recentQuotes.json");
-        System.out.println(myQuote.toString());
-        Quotes myApiQuote = Quotes.readQuotesFromApi();
-        System.out.println(myApiQuote.toString());
+Quotes randomQuoteFromFile = new Quotes();
+        Quotes a = randomQuoteFromFile.readQuotesFromFile("app/src/main/resources/recentQuotes.json");
+
+        System.out.println("Number of quotes from file: " + randomQuoteFromFile.quotesData.size());
+
+        Quotes quoteFromApi1 =randomQuoteFromFile.readQuotesFromApi();
+        Quotes quoteFromApi2 = randomQuoteFromFile.readQuotesFromApi();
+
+
+        System.out.println("Total number of quotes: " + randomQuoteFromFile.quotesData.size());
     }
 }
+
 

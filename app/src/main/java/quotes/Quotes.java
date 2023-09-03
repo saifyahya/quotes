@@ -2,8 +2,6 @@ package quotes;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import java.lang.reflect.Type;
-import com.google.gson.reflect.TypeToken;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -15,16 +13,13 @@ public class Quotes {
     private String author;
     private String text;
     private Quote quote;
-    private static ArrayList<Quotes> quotesData;
+    protected ArrayList<Quotes> quotesData;
 
-    public Quotes(String author, String text) {
-        this.author = author;
-        this.text = text;
+    public Quotes() {
         quotesData= new ArrayList<>();
     }
 
-    public static Quotes readQuotesFromFile(String path) {
-
+    public  Quotes readQuotesFromFile(String path) {
         Quotes randomQuote = null;
         Quotes[]quotes;
         try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
@@ -40,35 +35,47 @@ public class Quotes {
         return randomQuote;
     }
 
-    public static Quotes readQuotesFromApi() {
+    public  Quotes readQuotesFromApi() {
         Quotes myQuote = null;
         URL apiUrl = null;
         try {
             Gson gson = new Gson();
-            apiUrl = new URL("https://favqscom/api/qotd");
+            apiUrl = new URL("https://favqs.com/api/qotd");
             HttpURLConnection apiUrlConnection = (HttpURLConnection) apiUrl.openConnection();
             apiUrlConnection.setRequestMethod("GET");
-            InputStreamReader streamReader = null;
-                streamReader = new InputStreamReader(apiUrlConnection.getInputStream());
-                BufferedReader apiBufferedReader = new BufferedReader(streamReader);
-                String quoteData = apiBufferedReader.readLine();
 
-                System.out.println(quoteData);
-                gson = new GsonBuilder().setPrettyPrinting().create();
-                myQuote = gson.fromJson(quoteData, Quotes.class);
-                quotesData.add(myQuote);   //appending the new quote to the original list
+            InputStreamReader streamReader = new InputStreamReader(apiUrlConnection.getInputStream());
+            BufferedReader apiBufferedReader = new BufferedReader(streamReader);
+            String quoteData = apiBufferedReader.readLine();
+
+            System.out.println(quoteData);
+            gson = new GsonBuilder().setPrettyPrinting().create();
+            myQuote = gson.fromJson(quoteData, Quotes.class);
             System.out.println(myQuote);
-            File myFile = new File("app/src/main/resources/recentQuotes.json");
-            try (FileWriter write = new FileWriter(myFile)) {
-                gson.toJson(quoteData, write);          // writing the new list to json file
-            }
+
+            // Append the new quote to the original data
+            quotesData.add(myQuote);
+            System.out.println(quotesData.size());
+
         } catch (IllegalStateException | IOException e) {
-            myQuote = readQuotesFromFile("app/src/main/resources/recentQuotes.json");  //read from the file
-            System.out.println("Error"+e);
+            e.printStackTrace();
+            myQuote = readQuotesFromFile("app/src/main/resources/recentQuotes.json"); // Read from the file
+            System.out.println("Error: " + e);
         }
+        // Write the updated list back to the JSON file
+        WriteToFile();
         return myQuote;
     }
+    public void  WriteToFile() {
+        try(FileWriter writer = new FileWriter(new File("app/src/main/resources/recentQuotes1.json"))) {
+            Gson gson = new GsonBuilder()
+                    .setPrettyPrinting()
+                    .create();
+            gson.toJson(quotesData, writer);
 
+        } catch (IOException e) {
+e.printStackTrace();        }
+    }
 
     @Override
     public String toString() {

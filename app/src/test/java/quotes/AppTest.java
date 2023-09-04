@@ -5,6 +5,12 @@ package quotes;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.UnknownHostException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class AppTest {
@@ -18,10 +24,19 @@ Quotes result = quoteInstance.readQuotesFromFile("src/test/resources/recentQuote
         Quotes result = quoteInstance.readQuotesFromFile("saif/src/test/resources/recentQuotes.json") ;
         Assertions.assertNull(result);
     }
-    @Test void testQuotesFromApi() {  // test can read from api
-        Quotes quoteInstance = new Quotes();
-        Quotes result = quoteInstance.readQuotesFromApi();
-        Assertions.assertNotNull(result);
-    }
+
+    @Test void testWritingNewQuoteToTheFile(){  // test can read from api  write new quotes to the original file
+      Quotes myQuotes = new Quotes();
+      myQuotes.readQuotesFromFile("src/test/resources/recentQuotes.json");
+      Assertions.assertEquals(138,myQuotes.quotesData.size());  //original size of file =138
+       myQuotes.readQuotesFromApi("https://favqs.com/api/qotd","src/test/resources/recentQuotes.json");
+        Assertions.assertEquals(139,myQuotes.quotesData.size());
+    }  /*this test when executed more than once both sizes in assertion will increase by 1*/
+
+    @Test void testWhenFailedToReadFromApi_ReadFromFile() {  // test wrong api url
+        Quotes myQuotes = new Quotes();
+        Quotes result = myQuotes.readQuotesFromApi("https://favqscom/api/qotd","src/test/resources/recentQuotes.json");  //wrong url
+        Assertions.assertNull(result);
+    } 
 
 }

@@ -35,12 +35,12 @@ public class Quotes {
         return randomQuote;
     }
 
-    public  Quotes readQuotesFromApi() {
+    public  Quotes readQuotesFromApi(String url, String pathToWrite) {   //"https://favqs.com/api/qotd", //"app/src/main/resources/recentQuotes.json"
         Quotes myQuote = null;
         URL apiUrl = null;
         try {
             Gson gson = new Gson();
-            apiUrl = new URL("https://favqs.com/api/qotd");
+            apiUrl = new URL(url);
             HttpURLConnection apiUrlConnection = (HttpURLConnection) apiUrl.openConnection();
             apiUrlConnection.setRequestMethod("GET");
 
@@ -48,7 +48,6 @@ public class Quotes {
             BufferedReader apiBufferedReader = new BufferedReader(streamReader);
             String quoteData = apiBufferedReader.readLine();
 
-            System.out.println(quoteData);
             gson = new GsonBuilder().setPrettyPrinting().create();
             myQuote = gson.fromJson(quoteData, Quotes.class);
             System.out.println(myQuote);
@@ -56,21 +55,19 @@ public class Quotes {
             // Append the new quote to the original data
             quotesData.add(myQuote);
             System.out.println(quotesData.size());
+            // Write the updated list back to the JSON file
+            WriteToFile(pathToWrite);
 
         } catch (IllegalStateException | IOException e) {
             e.printStackTrace();
             myQuote = readQuotesFromFile("app/src/main/resources/recentQuotes.json"); // Read from the file
             System.out.println("Error: " + e);
         }
-        // Write the updated list back to the JSON file
-        WriteToFile();
         return myQuote;
     }
-    public void  WriteToFile() {
-        try(FileWriter writer = new FileWriter(new File("app/src/main/resources/recentQuotes1.json"))) {
-            Gson gson = new GsonBuilder()
-                    .setPrettyPrinting()
-                    .create();
+    public void  WriteToFile(String path) {  //"app/src/main/resources/recentQuotes.json"
+        try(FileWriter writer = new FileWriter(new File(path))) {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
             gson.toJson(quotesData, writer);
 
         } catch (IOException e) {

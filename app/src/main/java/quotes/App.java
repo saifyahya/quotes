@@ -11,8 +11,8 @@ Quotes randomQuoteFromFile = new Quotes();
 
         System.out.println("Number of quotes from file: " + randomQuoteFromFile.quotesData.size());
 
-        Quotes quoteFromApi1 =randomQuoteFromFile.readQuotesFromApi();
-        Quotes quoteFromApi2 = randomQuoteFromFile.readQuotesFromApi();
+        Quotes quoteFromApi1 =randomQuoteFromFile.readQuotesFromApi("https://favqs.com/api/qotd","app/src/main/resources/recentQuotes.json");
+        Quotes quoteFromApi2 = randomQuoteFromFile.readQuotesFromApi("https://favqs.com/api/qotd","app/src/main/resources/recentQuotes.json");
 
 
         System.out.println("Total number of quotes: " + randomQuoteFromFile.quotesData.size());
